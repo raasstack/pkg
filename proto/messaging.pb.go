@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.6
 // 	protoc        v6.30.2
-// source: pkg/proto/messaging.proto
+// source: proto/messaging.proto
 
 package proto
 
@@ -21,7 +21,130 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Command represents a command to be executed on clients
+// Message is the container for all message types
+type Message struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Type  string                 `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"`
+	// Types that are valid to be assigned to Payload:
+	//
+	//	*Message_Command
+	//	*Message_Heartbeat
+	//	*Message_ClientInfo
+	//	*Message_CommandResult
+	Payload       isMessage_Payload `protobuf_oneof:"payload"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Message) Reset() {
+	*x = Message{}
+	mi := &file_proto_messaging_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Message) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Message) ProtoMessage() {}
+
+func (x *Message) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_messaging_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Message.ProtoReflect.Descriptor instead.
+func (*Message) Descriptor() ([]byte, []int) {
+	return file_proto_messaging_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *Message) GetType() string {
+	if x != nil {
+		return x.Type
+	}
+	return ""
+}
+
+func (x *Message) GetPayload() isMessage_Payload {
+	if x != nil {
+		return x.Payload
+	}
+	return nil
+}
+
+func (x *Message) GetCommand() *Command {
+	if x != nil {
+		if x, ok := x.Payload.(*Message_Command); ok {
+			return x.Command
+		}
+	}
+	return nil
+}
+
+func (x *Message) GetHeartbeat() *Heartbeat {
+	if x != nil {
+		if x, ok := x.Payload.(*Message_Heartbeat); ok {
+			return x.Heartbeat
+		}
+	}
+	return nil
+}
+
+func (x *Message) GetClientInfo() *ClientInfo {
+	if x != nil {
+		if x, ok := x.Payload.(*Message_ClientInfo); ok {
+			return x.ClientInfo
+		}
+	}
+	return nil
+}
+
+func (x *Message) GetCommandResult() *CommandResult {
+	if x != nil {
+		if x, ok := x.Payload.(*Message_CommandResult); ok {
+			return x.CommandResult
+		}
+	}
+	return nil
+}
+
+type isMessage_Payload interface {
+	isMessage_Payload()
+}
+
+type Message_Command struct {
+	Command *Command `protobuf:"bytes,2,opt,name=command,proto3,oneof"`
+}
+
+type Message_Heartbeat struct {
+	Heartbeat *Heartbeat `protobuf:"bytes,3,opt,name=heartbeat,proto3,oneof"`
+}
+
+type Message_ClientInfo struct {
+	ClientInfo *ClientInfo `protobuf:"bytes,4,opt,name=client_info,json=clientInfo,proto3,oneof"`
+}
+
+type Message_CommandResult struct {
+	CommandResult *CommandResult `protobuf:"bytes,5,opt,name=command_result,json=commandResult,proto3,oneof"`
+}
+
+func (*Message_Command) isMessage_Payload() {}
+
+func (*Message_Heartbeat) isMessage_Payload() {}
+
+func (*Message_ClientInfo) isMessage_Payload() {}
+
+func (*Message_CommandResult) isMessage_Payload() {}
+
+// Command represents a command to be executed by a client
 type Command struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -36,7 +159,7 @@ type Command struct {
 
 func (x *Command) Reset() {
 	*x = Command{}
-	mi := &file_pkg_proto_messaging_proto_msgTypes[0]
+	mi := &file_proto_messaging_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -48,7 +171,7 @@ func (x *Command) String() string {
 func (*Command) ProtoMessage() {}
 
 func (x *Command) ProtoReflect() protoreflect.Message {
-	mi := &file_pkg_proto_messaging_proto_msgTypes[0]
+	mi := &file_proto_messaging_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -61,7 +184,7 @@ func (x *Command) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Command.ProtoReflect.Descriptor instead.
 func (*Command) Descriptor() ([]byte, []int) {
-	return file_pkg_proto_messaging_proto_rawDescGZIP(), []int{0}
+	return file_proto_messaging_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *Command) GetId() string {
@@ -106,23 +229,24 @@ func (x *Command) GetTimestamp() int64 {
 	return 0
 }
 
-// CommandResult represents the result of an executed command
+// CommandResult represents the result of a command execution
 type CommandResult struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
-	CommandId       string                 `protobuf:"bytes,1,opt,name=command_id,json=commandId,proto3" json:"command_id,omitempty"`
-	ClientId        string                 `protobuf:"bytes,2,opt,name=client_id,json=clientId,proto3" json:"client_id,omitempty"`
-	Success         bool                   `protobuf:"varint,3,opt,name=success,proto3" json:"success,omitempty"`
-	Output          string                 `protobuf:"bytes,4,opt,name=output,proto3" json:"output,omitempty"`
-	Error           string                 `protobuf:"bytes,5,opt,name=error,proto3" json:"error,omitempty"`
-	ExecutionTimeMs int64                  `protobuf:"varint,6,opt,name=execution_time_ms,json=executionTimeMs,proto3" json:"execution_time_ms,omitempty"`
-	Timestamp       int64                  `protobuf:"varint,7,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	Id              string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	CommandId       string                 `protobuf:"bytes,2,opt,name=command_id,json=commandId,proto3" json:"command_id,omitempty"`
+	ClientId        string                 `protobuf:"bytes,3,opt,name=client_id,json=clientId,proto3" json:"client_id,omitempty"`
+	Success         bool                   `protobuf:"varint,4,opt,name=success,proto3" json:"success,omitempty"`
+	Output          string                 `protobuf:"bytes,5,opt,name=output,proto3" json:"output,omitempty"`
+	Error           string                 `protobuf:"bytes,6,opt,name=error,proto3" json:"error,omitempty"`
+	ExecutionTimeMs int64                  `protobuf:"varint,7,opt,name=execution_time_ms,json=executionTimeMs,proto3" json:"execution_time_ms,omitempty"`
+	Timestamp       int64                  `protobuf:"varint,8,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
 
 func (x *CommandResult) Reset() {
 	*x = CommandResult{}
-	mi := &file_pkg_proto_messaging_proto_msgTypes[1]
+	mi := &file_proto_messaging_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -134,7 +258,7 @@ func (x *CommandResult) String() string {
 func (*CommandResult) ProtoMessage() {}
 
 func (x *CommandResult) ProtoReflect() protoreflect.Message {
-	mi := &file_pkg_proto_messaging_proto_msgTypes[1]
+	mi := &file_proto_messaging_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -147,7 +271,14 @@ func (x *CommandResult) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CommandResult.ProtoReflect.Descriptor instead.
 func (*CommandResult) Descriptor() ([]byte, []int) {
-	return file_pkg_proto_messaging_proto_rawDescGZIP(), []int{1}
+	return file_proto_messaging_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *CommandResult) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
 }
 
 func (x *CommandResult) GetCommandId() string {
@@ -199,15 +330,15 @@ func (x *CommandResult) GetTimestamp() int64 {
 	return 0
 }
 
-// ClientInfo represents information about a connected client
+// ClientInfo represents information about a client
 type ClientInfo struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Hostname      string                 `protobuf:"bytes,2,opt,name=hostname,proto3" json:"hostname,omitempty"`
-	IpAddress     string                 `protobuf:"bytes,3,opt,name=ip_address,json=ipAddress,proto3" json:"ip_address,omitempty"`
-	Os            string                 `protobuf:"bytes,4,opt,name=os,proto3" json:"os,omitempty"`
-	OsVersion     string                 `protobuf:"bytes,5,opt,name=os_version,json=osVersion,proto3" json:"os_version,omitempty"`
-	Architecture  string                 `protobuf:"bytes,6,opt,name=architecture,proto3" json:"architecture,omitempty"`
+	Os            string                 `protobuf:"bytes,3,opt,name=os,proto3" json:"os,omitempty"`
+	OsVersion     string                 `protobuf:"bytes,4,opt,name=os_version,json=osVersion,proto3" json:"os_version,omitempty"`
+	Architecture  string                 `protobuf:"bytes,5,opt,name=architecture,proto3" json:"architecture,omitempty"`
+	IpAddress     string                 `protobuf:"bytes,6,opt,name=ip_address,json=ipAddress,proto3" json:"ip_address,omitempty"`
 	ConnectedAt   int64                  `protobuf:"varint,7,opt,name=connected_at,json=connectedAt,proto3" json:"connected_at,omitempty"`
 	LastSeenAt    int64                  `protobuf:"varint,8,opt,name=last_seen_at,json=lastSeenAt,proto3" json:"last_seen_at,omitempty"`
 	Capabilities  []string               `protobuf:"bytes,9,rep,name=capabilities,proto3" json:"capabilities,omitempty"`
@@ -218,7 +349,7 @@ type ClientInfo struct {
 
 func (x *ClientInfo) Reset() {
 	*x = ClientInfo{}
-	mi := &file_pkg_proto_messaging_proto_msgTypes[2]
+	mi := &file_proto_messaging_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -230,7 +361,7 @@ func (x *ClientInfo) String() string {
 func (*ClientInfo) ProtoMessage() {}
 
 func (x *ClientInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_pkg_proto_messaging_proto_msgTypes[2]
+	mi := &file_proto_messaging_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -243,7 +374,7 @@ func (x *ClientInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ClientInfo.ProtoReflect.Descriptor instead.
 func (*ClientInfo) Descriptor() ([]byte, []int) {
-	return file_pkg_proto_messaging_proto_rawDescGZIP(), []int{2}
+	return file_proto_messaging_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *ClientInfo) GetId() string {
@@ -256,13 +387,6 @@ func (x *ClientInfo) GetId() string {
 func (x *ClientInfo) GetHostname() string {
 	if x != nil {
 		return x.Hostname
-	}
-	return ""
-}
-
-func (x *ClientInfo) GetIpAddress() string {
-	if x != nil {
-		return x.IpAddress
 	}
 	return ""
 }
@@ -284,6 +408,13 @@ func (x *ClientInfo) GetOsVersion() string {
 func (x *ClientInfo) GetArchitecture() string {
 	if x != nil {
 		return x.Architecture
+	}
+	return ""
+}
+
+func (x *ClientInfo) GetIpAddress() string {
+	if x != nil {
+		return x.IpAddress
 	}
 	return ""
 }
@@ -316,7 +447,68 @@ func (x *ClientInfo) GetMetrics() *SystemMetrics {
 	return nil
 }
 
-// SystemMetrics represents system metrics from a client
+// Heartbeat represents a client heartbeat
+type Heartbeat struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ClientId      string                 `protobuf:"bytes,1,opt,name=client_id,json=clientId,proto3" json:"client_id,omitempty"`
+	Timestamp     int64                  `protobuf:"varint,2,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	Metrics       *SystemMetrics         `protobuf:"bytes,3,opt,name=metrics,proto3" json:"metrics,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Heartbeat) Reset() {
+	*x = Heartbeat{}
+	mi := &file_proto_messaging_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Heartbeat) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Heartbeat) ProtoMessage() {}
+
+func (x *Heartbeat) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_messaging_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Heartbeat.ProtoReflect.Descriptor instead.
+func (*Heartbeat) Descriptor() ([]byte, []int) {
+	return file_proto_messaging_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *Heartbeat) GetClientId() string {
+	if x != nil {
+		return x.ClientId
+	}
+	return ""
+}
+
+func (x *Heartbeat) GetTimestamp() int64 {
+	if x != nil {
+		return x.Timestamp
+	}
+	return 0
+}
+
+func (x *Heartbeat) GetMetrics() *SystemMetrics {
+	if x != nil {
+		return x.Metrics
+	}
+	return nil
+}
+
+// SystemMetrics represents system metrics
 type SystemMetrics struct {
 	state              protoimpl.MessageState `protogen:"open.v1"`
 	CpuUsagePercent    float64                `protobuf:"fixed64,1,opt,name=cpu_usage_percent,json=cpuUsagePercent,proto3" json:"cpu_usage_percent,omitempty"`
@@ -336,7 +528,7 @@ type SystemMetrics struct {
 
 func (x *SystemMetrics) Reset() {
 	*x = SystemMetrics{}
-	mi := &file_pkg_proto_messaging_proto_msgTypes[3]
+	mi := &file_proto_messaging_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -348,7 +540,7 @@ func (x *SystemMetrics) String() string {
 func (*SystemMetrics) ProtoMessage() {}
 
 func (x *SystemMetrics) ProtoReflect() protoreflect.Message {
-	mi := &file_pkg_proto_messaging_proto_msgTypes[3]
+	mi := &file_proto_messaging_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -361,7 +553,7 @@ func (x *SystemMetrics) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SystemMetrics.ProtoReflect.Descriptor instead.
 func (*SystemMetrics) Descriptor() ([]byte, []int) {
-	return file_pkg_proto_messaging_proto_rawDescGZIP(), []int{3}
+	return file_proto_messaging_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *SystemMetrics) GetCpuUsagePercent() float64 {
@@ -441,7 +633,7 @@ func (x *SystemMetrics) GetNetwork() *NetworkMetrics {
 	return nil
 }
 
-// DiskMetrics represents disk metrics
+// DiskMetrics represents disk usage metrics
 type DiskMetrics struct {
 	state            protoimpl.MessageState `protogen:"open.v1"`
 	TotalDiskBytes   int64                  `protobuf:"varint,1,opt,name=total_disk_bytes,json=totalDiskBytes,proto3" json:"total_disk_bytes,omitempty"`
@@ -454,7 +646,7 @@ type DiskMetrics struct {
 
 func (x *DiskMetrics) Reset() {
 	*x = DiskMetrics{}
-	mi := &file_pkg_proto_messaging_proto_msgTypes[4]
+	mi := &file_proto_messaging_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -466,7 +658,7 @@ func (x *DiskMetrics) String() string {
 func (*DiskMetrics) ProtoMessage() {}
 
 func (x *DiskMetrics) ProtoReflect() protoreflect.Message {
-	mi := &file_pkg_proto_messaging_proto_msgTypes[4]
+	mi := &file_proto_messaging_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -479,7 +671,7 @@ func (x *DiskMetrics) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DiskMetrics.ProtoReflect.Descriptor instead.
 func (*DiskMetrics) Descriptor() ([]byte, []int) {
-	return file_pkg_proto_messaging_proto_rawDescGZIP(), []int{4}
+	return file_proto_messaging_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *DiskMetrics) GetTotalDiskBytes() int64 {
@@ -510,7 +702,7 @@ func (x *DiskMetrics) GetDiskUsagePercent() float64 {
 	return 0
 }
 
-// NetworkMetrics represents network metrics
+// NetworkMetrics represents network usage metrics
 type NetworkMetrics struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
 	BytesSent       int64                  `protobuf:"varint,1,opt,name=bytes_sent,json=bytesSent,proto3" json:"bytes_sent,omitempty"`
@@ -523,7 +715,7 @@ type NetworkMetrics struct {
 
 func (x *NetworkMetrics) Reset() {
 	*x = NetworkMetrics{}
-	mi := &file_pkg_proto_messaging_proto_msgTypes[5]
+	mi := &file_proto_messaging_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -535,7 +727,7 @@ func (x *NetworkMetrics) String() string {
 func (*NetworkMetrics) ProtoMessage() {}
 
 func (x *NetworkMetrics) ProtoReflect() protoreflect.Message {
-	mi := &file_pkg_proto_messaging_proto_msgTypes[5]
+	mi := &file_proto_messaging_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -548,7 +740,7 @@ func (x *NetworkMetrics) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NetworkMetrics.ProtoReflect.Descriptor instead.
 func (*NetworkMetrics) Descriptor() ([]byte, []int) {
-	return file_pkg_proto_messaging_proto_rawDescGZIP(), []int{5}
+	return file_proto_messaging_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *NetworkMetrics) GetBytesSent() int64 {
@@ -579,195 +771,19 @@ func (x *NetworkMetrics) GetPacketsReceived() int64 {
 	return 0
 }
 
-// Message is the wrapper message for all communications
-type Message struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	Type  string                 `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"`
-	// Types that are valid to be assigned to Payload:
-	//
-	//	*Message_Command
-	//	*Message_CommandResult
-	//	*Message_ClientInfo
-	//	*Message_Heartbeat
-	Payload       isMessage_Payload `protobuf_oneof:"payload"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
+var File_proto_messaging_proto protoreflect.FileDescriptor
 
-func (x *Message) Reset() {
-	*x = Message{}
-	mi := &file_pkg_proto_messaging_proto_msgTypes[6]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *Message) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Message) ProtoMessage() {}
-
-func (x *Message) ProtoReflect() protoreflect.Message {
-	mi := &file_pkg_proto_messaging_proto_msgTypes[6]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Message.ProtoReflect.Descriptor instead.
-func (*Message) Descriptor() ([]byte, []int) {
-	return file_pkg_proto_messaging_proto_rawDescGZIP(), []int{6}
-}
-
-func (x *Message) GetType() string {
-	if x != nil {
-		return x.Type
-	}
-	return ""
-}
-
-func (x *Message) GetPayload() isMessage_Payload {
-	if x != nil {
-		return x.Payload
-	}
-	return nil
-}
-
-func (x *Message) GetCommand() *Command {
-	if x != nil {
-		if x, ok := x.Payload.(*Message_Command); ok {
-			return x.Command
-		}
-	}
-	return nil
-}
-
-func (x *Message) GetCommandResult() *CommandResult {
-	if x != nil {
-		if x, ok := x.Payload.(*Message_CommandResult); ok {
-			return x.CommandResult
-		}
-	}
-	return nil
-}
-
-func (x *Message) GetClientInfo() *ClientInfo {
-	if x != nil {
-		if x, ok := x.Payload.(*Message_ClientInfo); ok {
-			return x.ClientInfo
-		}
-	}
-	return nil
-}
-
-func (x *Message) GetHeartbeat() *Heartbeat {
-	if x != nil {
-		if x, ok := x.Payload.(*Message_Heartbeat); ok {
-			return x.Heartbeat
-		}
-	}
-	return nil
-}
-
-type isMessage_Payload interface {
-	isMessage_Payload()
-}
-
-type Message_Command struct {
-	Command *Command `protobuf:"bytes,2,opt,name=command,proto3,oneof"`
-}
-
-type Message_CommandResult struct {
-	CommandResult *CommandResult `protobuf:"bytes,3,opt,name=command_result,json=commandResult,proto3,oneof"`
-}
-
-type Message_ClientInfo struct {
-	ClientInfo *ClientInfo `protobuf:"bytes,4,opt,name=client_info,json=clientInfo,proto3,oneof"`
-}
-
-type Message_Heartbeat struct {
-	Heartbeat *Heartbeat `protobuf:"bytes,5,opt,name=heartbeat,proto3,oneof"`
-}
-
-func (*Message_Command) isMessage_Payload() {}
-
-func (*Message_CommandResult) isMessage_Payload() {}
-
-func (*Message_ClientInfo) isMessage_Payload() {}
-
-func (*Message_Heartbeat) isMessage_Payload() {}
-
-// Heartbeat message for keep-alive
-type Heartbeat struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	ClientId      string                 `protobuf:"bytes,1,opt,name=client_id,json=clientId,proto3" json:"client_id,omitempty"`
-	Timestamp     int64                  `protobuf:"varint,2,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
-	Metrics       *SystemMetrics         `protobuf:"bytes,3,opt,name=metrics,proto3" json:"metrics,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *Heartbeat) Reset() {
-	*x = Heartbeat{}
-	mi := &file_pkg_proto_messaging_proto_msgTypes[7]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *Heartbeat) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Heartbeat) ProtoMessage() {}
-
-func (x *Heartbeat) ProtoReflect() protoreflect.Message {
-	mi := &file_pkg_proto_messaging_proto_msgTypes[7]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Heartbeat.ProtoReflect.Descriptor instead.
-func (*Heartbeat) Descriptor() ([]byte, []int) {
-	return file_pkg_proto_messaging_proto_rawDescGZIP(), []int{7}
-}
-
-func (x *Heartbeat) GetClientId() string {
-	if x != nil {
-		return x.ClientId
-	}
-	return ""
-}
-
-func (x *Heartbeat) GetTimestamp() int64 {
-	if x != nil {
-		return x.Timestamp
-	}
-	return 0
-}
-
-func (x *Heartbeat) GetMetrics() *SystemMetrics {
-	if x != nil {
-		return x.Metrics
-	}
-	return nil
-}
-
-var File_pkg_proto_messaging_proto protoreflect.FileDescriptor
-
-const file_pkg_proto_messaging_proto_rawDesc = "" +
+const file_proto_messaging_proto_rawDesc = "" +
 	"\n" +
-	"\x19pkg/proto/messaging.proto\x12\x05proto\"\xa3\x01\n" +
+	"\x15proto/messaging.proto\x12\braastack\"\x87\x02\n" +
+	"\aMessage\x12\x12\n" +
+	"\x04type\x18\x01 \x01(\tR\x04type\x12-\n" +
+	"\acommand\x18\x02 \x01(\v2\x11.raastack.CommandH\x00R\acommand\x123\n" +
+	"\theartbeat\x18\x03 \x01(\v2\x13.raastack.HeartbeatH\x00R\theartbeat\x127\n" +
+	"\vclient_info\x18\x04 \x01(\v2\x14.raastack.ClientInfoH\x00R\n" +
+	"clientInfo\x12@\n" +
+	"\x0ecommand_result\x18\x05 \x01(\v2\x17.raastack.CommandResultH\x00R\rcommandResultB\t\n" +
+	"\apayload\"\xa3\x01\n" +
 	"\aCommand\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x18\n" +
 	"\acommand\x18\x02 \x01(\tR\acommand\x12\x12\n" +
@@ -775,32 +791,37 @@ const file_pkg_proto_messaging_proto_rawDesc = "" +
 	"\vrequire_pty\x18\x04 \x01(\bR\n" +
 	"requirePty\x12\x1b\n" +
 	"\tsender_id\x18\x05 \x01(\tR\bsenderId\x12\x1c\n" +
-	"\ttimestamp\x18\x06 \x01(\x03R\ttimestamp\"\xdd\x01\n" +
-	"\rCommandResult\x12\x1d\n" +
+	"\ttimestamp\x18\x06 \x01(\x03R\ttimestamp\"\xed\x01\n" +
+	"\rCommandResult\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
-	"command_id\x18\x01 \x01(\tR\tcommandId\x12\x1b\n" +
-	"\tclient_id\x18\x02 \x01(\tR\bclientId\x12\x18\n" +
-	"\asuccess\x18\x03 \x01(\bR\asuccess\x12\x16\n" +
-	"\x06output\x18\x04 \x01(\tR\x06output\x12\x14\n" +
-	"\x05error\x18\x05 \x01(\tR\x05error\x12*\n" +
-	"\x11execution_time_ms\x18\x06 \x01(\x03R\x0fexecutionTimeMs\x12\x1c\n" +
-	"\ttimestamp\x18\a \x01(\x03R\ttimestamp\"\xc3\x02\n" +
+	"command_id\x18\x02 \x01(\tR\tcommandId\x12\x1b\n" +
+	"\tclient_id\x18\x03 \x01(\tR\bclientId\x12\x18\n" +
+	"\asuccess\x18\x04 \x01(\bR\asuccess\x12\x16\n" +
+	"\x06output\x18\x05 \x01(\tR\x06output\x12\x14\n" +
+	"\x05error\x18\x06 \x01(\tR\x05error\x12*\n" +
+	"\x11execution_time_ms\x18\a \x01(\x03R\x0fexecutionTimeMs\x12\x1c\n" +
+	"\ttimestamp\x18\b \x01(\x03R\ttimestamp\"\xc6\x02\n" +
 	"\n" +
 	"ClientInfo\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n" +
-	"\bhostname\x18\x02 \x01(\tR\bhostname\x12\x1d\n" +
+	"\bhostname\x18\x02 \x01(\tR\bhostname\x12\x0e\n" +
+	"\x02os\x18\x03 \x01(\tR\x02os\x12\x1d\n" +
 	"\n" +
-	"ip_address\x18\x03 \x01(\tR\tipAddress\x12\x0e\n" +
-	"\x02os\x18\x04 \x01(\tR\x02os\x12\x1d\n" +
+	"os_version\x18\x04 \x01(\tR\tosVersion\x12\"\n" +
+	"\farchitecture\x18\x05 \x01(\tR\farchitecture\x12\x1d\n" +
 	"\n" +
-	"os_version\x18\x05 \x01(\tR\tosVersion\x12\"\n" +
-	"\farchitecture\x18\x06 \x01(\tR\farchitecture\x12!\n" +
+	"ip_address\x18\x06 \x01(\tR\tipAddress\x12!\n" +
 	"\fconnected_at\x18\a \x01(\x03R\vconnectedAt\x12 \n" +
 	"\flast_seen_at\x18\b \x01(\x03R\n" +
 	"lastSeenAt\x12\"\n" +
-	"\fcapabilities\x18\t \x03(\tR\fcapabilities\x12.\n" +
+	"\fcapabilities\x18\t \x03(\tR\fcapabilities\x121\n" +
 	"\ametrics\x18\n" +
-	" \x01(\v2\x14.proto.SystemMetricsR\ametrics\"\xd5\x03\n" +
+	" \x01(\v2\x17.raastack.SystemMetricsR\ametrics\"y\n" +
+	"\tHeartbeat\x12\x1b\n" +
+	"\tclient_id\x18\x01 \x01(\tR\bclientId\x12\x1c\n" +
+	"\ttimestamp\x18\x02 \x01(\x03R\ttimestamp\x121\n" +
+	"\ametrics\x18\x03 \x01(\v2\x17.raastack.SystemMetricsR\ametrics\"\xdb\x03\n" +
 	"\rSystemMetrics\x12*\n" +
 	"\x11cpu_usage_percent\x18\x01 \x01(\x01R\x0fcpuUsagePercent\x120\n" +
 	"\x14memory_usage_percent\x18\x02 \x01(\x01R\x12memoryUsagePercent\x12,\n" +
@@ -811,10 +832,10 @@ const file_pkg_proto_messaging_proto_rawDesc = "" +
 	"\vload_avg_5m\x18\a \x01(\x01R\tloadAvg5m\x12 \n" +
 	"\fload_avg_15m\x18\b \x01(\x01R\n" +
 	"loadAvg15m\x12%\n" +
-	"\x0euptime_seconds\x18\t \x01(\x03R\ruptimeSeconds\x12&\n" +
+	"\x0euptime_seconds\x18\t \x01(\x03R\ruptimeSeconds\x12)\n" +
 	"\x04disk\x18\n" +
-	" \x01(\v2\x12.proto.DiskMetricsR\x04disk\x12/\n" +
-	"\anetwork\x18\v \x01(\v2\x15.proto.NetworkMetricsR\anetwork\"\xb5\x01\n" +
+	" \x01(\v2\x15.raastack.DiskMetricsR\x04disk\x122\n" +
+	"\anetwork\x18\v \x01(\v2\x18.raastack.NetworkMetricsR\anetwork\"\xb5\x01\n" +
 	"\vDiskMetrics\x12(\n" +
 	"\x10total_disk_bytes\x18\x01 \x01(\x03R\x0etotalDiskBytes\x12&\n" +
 	"\x0fused_disk_bytes\x18\x02 \x01(\x03R\rusedDiskBytes\x12&\n" +
@@ -825,52 +846,40 @@ const file_pkg_proto_messaging_proto_rawDesc = "" +
 	"bytes_sent\x18\x01 \x01(\x03R\tbytesSent\x12%\n" +
 	"\x0ebytes_received\x18\x02 \x01(\x03R\rbytesReceived\x12!\n" +
 	"\fpackets_sent\x18\x03 \x01(\x03R\vpacketsSent\x12)\n" +
-	"\x10packets_received\x18\x04 \x01(\x03R\x0fpacketsReceived\"\xfb\x01\n" +
-	"\aMessage\x12\x12\n" +
-	"\x04type\x18\x01 \x01(\tR\x04type\x12*\n" +
-	"\acommand\x18\x02 \x01(\v2\x0e.proto.CommandH\x00R\acommand\x12=\n" +
-	"\x0ecommand_result\x18\x03 \x01(\v2\x14.proto.CommandResultH\x00R\rcommandResult\x124\n" +
-	"\vclient_info\x18\x04 \x01(\v2\x11.proto.ClientInfoH\x00R\n" +
-	"clientInfo\x120\n" +
-	"\theartbeat\x18\x05 \x01(\v2\x10.proto.HeartbeatH\x00R\theartbeatB\t\n" +
-	"\apayload\"v\n" +
-	"\tHeartbeat\x12\x1b\n" +
-	"\tclient_id\x18\x01 \x01(\tR\bclientId\x12\x1c\n" +
-	"\ttimestamp\x18\x02 \x01(\x03R\ttimestamp\x12.\n" +
-	"\ametrics\x18\x03 \x01(\v2\x14.proto.SystemMetricsR\ametricsB\x15Z\x13raasstack/pkg/protob\x06proto3"
+	"\x10packets_received\x18\x04 \x01(\x03R\x0fpacketsReceivedB Z\x1egithub.com/raasstack/pkg/protob\x06proto3"
 
 var (
-	file_pkg_proto_messaging_proto_rawDescOnce sync.Once
-	file_pkg_proto_messaging_proto_rawDescData []byte
+	file_proto_messaging_proto_rawDescOnce sync.Once
+	file_proto_messaging_proto_rawDescData []byte
 )
 
-func file_pkg_proto_messaging_proto_rawDescGZIP() []byte {
-	file_pkg_proto_messaging_proto_rawDescOnce.Do(func() {
-		file_pkg_proto_messaging_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_pkg_proto_messaging_proto_rawDesc), len(file_pkg_proto_messaging_proto_rawDesc)))
+func file_proto_messaging_proto_rawDescGZIP() []byte {
+	file_proto_messaging_proto_rawDescOnce.Do(func() {
+		file_proto_messaging_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_proto_messaging_proto_rawDesc), len(file_proto_messaging_proto_rawDesc)))
 	})
-	return file_pkg_proto_messaging_proto_rawDescData
+	return file_proto_messaging_proto_rawDescData
 }
 
-var file_pkg_proto_messaging_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
-var file_pkg_proto_messaging_proto_goTypes = []any{
-	(*Command)(nil),        // 0: proto.Command
-	(*CommandResult)(nil),  // 1: proto.CommandResult
-	(*ClientInfo)(nil),     // 2: proto.ClientInfo
-	(*SystemMetrics)(nil),  // 3: proto.SystemMetrics
-	(*DiskMetrics)(nil),    // 4: proto.DiskMetrics
-	(*NetworkMetrics)(nil), // 5: proto.NetworkMetrics
-	(*Message)(nil),        // 6: proto.Message
-	(*Heartbeat)(nil),      // 7: proto.Heartbeat
+var file_proto_messaging_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+var file_proto_messaging_proto_goTypes = []any{
+	(*Message)(nil),        // 0: raastack.Message
+	(*Command)(nil),        // 1: raastack.Command
+	(*CommandResult)(nil),  // 2: raastack.CommandResult
+	(*ClientInfo)(nil),     // 3: raastack.ClientInfo
+	(*Heartbeat)(nil),      // 4: raastack.Heartbeat
+	(*SystemMetrics)(nil),  // 5: raastack.SystemMetrics
+	(*DiskMetrics)(nil),    // 6: raastack.DiskMetrics
+	(*NetworkMetrics)(nil), // 7: raastack.NetworkMetrics
 }
-var file_pkg_proto_messaging_proto_depIdxs = []int32{
-	3, // 0: proto.ClientInfo.metrics:type_name -> proto.SystemMetrics
-	4, // 1: proto.SystemMetrics.disk:type_name -> proto.DiskMetrics
-	5, // 2: proto.SystemMetrics.network:type_name -> proto.NetworkMetrics
-	0, // 3: proto.Message.command:type_name -> proto.Command
-	1, // 4: proto.Message.command_result:type_name -> proto.CommandResult
-	2, // 5: proto.Message.client_info:type_name -> proto.ClientInfo
-	7, // 6: proto.Message.heartbeat:type_name -> proto.Heartbeat
-	3, // 7: proto.Heartbeat.metrics:type_name -> proto.SystemMetrics
+var file_proto_messaging_proto_depIdxs = []int32{
+	1, // 0: raastack.Message.command:type_name -> raastack.Command
+	4, // 1: raastack.Message.heartbeat:type_name -> raastack.Heartbeat
+	3, // 2: raastack.Message.client_info:type_name -> raastack.ClientInfo
+	2, // 3: raastack.Message.command_result:type_name -> raastack.CommandResult
+	5, // 4: raastack.ClientInfo.metrics:type_name -> raastack.SystemMetrics
+	5, // 5: raastack.Heartbeat.metrics:type_name -> raastack.SystemMetrics
+	6, // 6: raastack.SystemMetrics.disk:type_name -> raastack.DiskMetrics
+	7, // 7: raastack.SystemMetrics.network:type_name -> raastack.NetworkMetrics
 	8, // [8:8] is the sub-list for method output_type
 	8, // [8:8] is the sub-list for method input_type
 	8, // [8:8] is the sub-list for extension type_name
@@ -878,32 +887,32 @@ var file_pkg_proto_messaging_proto_depIdxs = []int32{
 	0, // [0:8] is the sub-list for field type_name
 }
 
-func init() { file_pkg_proto_messaging_proto_init() }
-func file_pkg_proto_messaging_proto_init() {
-	if File_pkg_proto_messaging_proto != nil {
+func init() { file_proto_messaging_proto_init() }
+func file_proto_messaging_proto_init() {
+	if File_proto_messaging_proto != nil {
 		return
 	}
-	file_pkg_proto_messaging_proto_msgTypes[6].OneofWrappers = []any{
+	file_proto_messaging_proto_msgTypes[0].OneofWrappers = []any{
 		(*Message_Command)(nil),
-		(*Message_CommandResult)(nil),
-		(*Message_ClientInfo)(nil),
 		(*Message_Heartbeat)(nil),
+		(*Message_ClientInfo)(nil),
+		(*Message_CommandResult)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_pkg_proto_messaging_proto_rawDesc), len(file_pkg_proto_messaging_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_messaging_proto_rawDesc), len(file_proto_messaging_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
-		GoTypes:           file_pkg_proto_messaging_proto_goTypes,
-		DependencyIndexes: file_pkg_proto_messaging_proto_depIdxs,
-		MessageInfos:      file_pkg_proto_messaging_proto_msgTypes,
+		GoTypes:           file_proto_messaging_proto_goTypes,
+		DependencyIndexes: file_proto_messaging_proto_depIdxs,
+		MessageInfos:      file_proto_messaging_proto_msgTypes,
 	}.Build()
-	File_pkg_proto_messaging_proto = out.File
-	file_pkg_proto_messaging_proto_goTypes = nil
-	file_pkg_proto_messaging_proto_depIdxs = nil
+	File_proto_messaging_proto = out.File
+	file_proto_messaging_proto_goTypes = nil
+	file_proto_messaging_proto_depIdxs = nil
 }

@@ -1,10 +1,21 @@
 syntax = "proto3";
+package raastack;
 
-package proto;
+option go_package = "github.com/raasstack/pkg/proto";
 
-option go_package = "raasstack/pkg/proto";
+// Message is the container for all message types
+message Message {
+  string type = 1;
 
-// Command represents a command to be executed on clients
+  oneof payload {
+    Command command = 2;
+    Heartbeat heartbeat = 3;
+    ClientInfo client_info = 4;
+    CommandResult command_result = 5;
+  }
+}
+
+// Command represents a command to be executed by a client
 message Command {
   string id = 1;
   string command = 2;
@@ -14,47 +25,58 @@ message Command {
   int64 timestamp = 6;
 }
 
-// CommandResult represents the result of an executed command
+// CommandResult represents the result of a command execution
 message CommandResult {
-  string command_id = 1;
-  string client_id = 2;
-  bool success = 3;
-  string output = 4;
-  string error = 5;
-  int64 execution_time_ms = 6;
-  int64 timestamp = 7;
+  string id = 1;
+  string command_id = 2;
+  string client_id = 3;
+  bool success = 4;
+  string output = 5;
+  string error = 6;
+  int64 execution_time_ms = 7;
+  int64 timestamp = 8;
 }
 
-// ClientInfo represents information about a connected client
+// ClientInfo represents information about a client
 message ClientInfo {
   string id = 1;
   string hostname = 2;
-  string ip_address = 3;
-  string os = 4;
-  string os_version = 5;
-  string architecture = 6;
+  string os = 3;
+  string os_version = 4;
+  string architecture = 5;
+  string ip_address = 6;
   int64 connected_at = 7;
   int64 last_seen_at = 8;
   repeated string capabilities = 9;
   SystemMetrics metrics = 10;
 }
 
-// SystemMetrics represents system metrics from a client
+// Heartbeat represents a client heartbeat
+message Heartbeat {
+  string client_id = 1;
+  int64 timestamp = 2;
+  SystemMetrics metrics = 3;
+}
+
+// SystemMetrics represents system metrics
 message SystemMetrics {
   double cpu_usage_percent = 1;
   double memory_usage_percent = 2;
   int64 total_memory_bytes = 3;
   int64 used_memory_bytes = 4;
   int64 free_memory_bytes = 5;
+
   double load_avg_1m = 6;
   double load_avg_5m = 7;
   double load_avg_15m = 8;
+
   int64 uptime_seconds = 9;
+
   DiskMetrics disk = 10;
   NetworkMetrics network = 11;
 }
 
-// DiskMetrics represents disk metrics
+// DiskMetrics represents disk usage metrics
 message DiskMetrics {
   int64 total_disk_bytes = 1;
   int64 used_disk_bytes = 2;
@@ -62,28 +84,10 @@ message DiskMetrics {
   double disk_usage_percent = 4;
 }
 
-// NetworkMetrics represents network metrics
+// NetworkMetrics represents network usage metrics
 message NetworkMetrics {
   int64 bytes_sent = 1;
   int64 bytes_received = 2;
   int64 packets_sent = 3;
   int64 packets_received = 4;
-}
-
-// Message is the wrapper message for all communications
-message Message {
-  string type = 1;
-  oneof payload {
-    Command command = 2;
-    CommandResult command_result = 3;
-    ClientInfo client_info = 4;
-    Heartbeat heartbeat = 5;
-  }
-}
-
-// Heartbeat message for keep-alive
-message Heartbeat {
-  string client_id = 1;
-  int64 timestamp = 2;
-  SystemMetrics metrics = 3;
 }
