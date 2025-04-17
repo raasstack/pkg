@@ -1,0 +1,89 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "raasstack/pkg/proto";
+
+// Command represents a command to be executed on clients
+message Command {
+  string id = 1;
+  string command = 2;
+  repeated string args = 3;
+  bool require_pty = 4;
+  string sender_id = 5;
+  int64 timestamp = 6;
+}
+
+// CommandResult represents the result of an executed command
+message CommandResult {
+  string command_id = 1;
+  string client_id = 2;
+  bool success = 3;
+  string output = 4;
+  string error = 5;
+  int64 execution_time_ms = 6;
+  int64 timestamp = 7;
+}
+
+// ClientInfo represents information about a connected client
+message ClientInfo {
+  string id = 1;
+  string hostname = 2;
+  string ip_address = 3;
+  string os = 4;
+  string os_version = 5;
+  string architecture = 6;
+  int64 connected_at = 7;
+  int64 last_seen_at = 8;
+  repeated string capabilities = 9;
+  SystemMetrics metrics = 10;
+}
+
+// SystemMetrics represents system metrics from a client
+message SystemMetrics {
+  double cpu_usage_percent = 1;
+  double memory_usage_percent = 2;
+  int64 total_memory_bytes = 3;
+  int64 used_memory_bytes = 4;
+  int64 free_memory_bytes = 5;
+  double load_avg_1m = 6;
+  double load_avg_5m = 7;
+  double load_avg_15m = 8;
+  int64 uptime_seconds = 9;
+  DiskMetrics disk = 10;
+  NetworkMetrics network = 11;
+}
+
+// DiskMetrics represents disk metrics
+message DiskMetrics {
+  int64 total_disk_bytes = 1;
+  int64 used_disk_bytes = 2;
+  int64 free_disk_bytes = 3;
+  double disk_usage_percent = 4;
+}
+
+// NetworkMetrics represents network metrics
+message NetworkMetrics {
+  int64 bytes_sent = 1;
+  int64 bytes_received = 2;
+  int64 packets_sent = 3;
+  int64 packets_received = 4;
+}
+
+// Message is the wrapper message for all communications
+message Message {
+  string type = 1;
+  oneof payload {
+    Command command = 2;
+    CommandResult command_result = 3;
+    ClientInfo client_info = 4;
+    Heartbeat heartbeat = 5;
+  }
+}
+
+// Heartbeat message for keep-alive
+message Heartbeat {
+  string client_id = 1;
+  int64 timestamp = 2;
+  SystemMetrics metrics = 3;
+}
